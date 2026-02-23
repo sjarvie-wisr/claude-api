@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --navy: #323F51;
+    --teal: #62C4BB;
+    --teal-dark: #4aada4;
+    --teal-light: #e8f8f7;
+    --bg: #f7f9fb;
+    --sidebar-w: 260px;
+    --code-bg: #1e2a38;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--navy);
+  }
+}
+
+@layer components {
+  /* Syntax highlight colours used inside CodeBlock pre elements */
+  .hl-key   { color: #7dd3fc; }
+  .hl-str   { color: #86efac; }
+  .hl-num   { color: #fbbf24; }
+  .hl-bool  { color: #f472b6; }
+  .hl-comment { color: #64748b; font-style: italic; }
+}
