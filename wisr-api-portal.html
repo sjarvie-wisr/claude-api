@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Wisr Developer Portal</title>
+<style>
+  :root{
+    --navy:#323F51;--teal:#62C4BB;--teal-dark:#4aada4;--teal-light:#e8f8f7;
+    --bg:#f7f9fb;--sidebar-w:260px;--code-bg:#1e2a38;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--navy);display:flex;flex-direction:column;min-height:100vh}
+
+  /* TOP NAV */
+  nav{background:var(--navy);height:56px;display:flex;align-items:center;padding:0 24px;gap:16px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+  .logo{display:flex;align-items:center;gap:10px;color:#fff;font-weight:700;font-size:18px;letter-spacing:-.3px;text-decoration:none}
+  .logo svg{width:28px;height:34px}
+  .logo span{color:var(--teal)}
+  nav .badge{margin-left:8px;background:var(--teal);color:#fff;font-size:11px;padding:2px 8px;border-radius:20px;font-weight:600}
+  nav .spacer{flex:1}
+  nav a{color:rgba(255,255,255,.7);text-decoration:none;font-size:14px;padding:6px 12px;border-radius:6px;transition:all .15s}
+  nav a:hover{color:#fff;background:rgba(255,255,255,.1)}
+  .nav-cta{background:var(--teal)!important;color:#fff!important;font-weight:600}
+  .nav-cta:hover{background:var(--teal-dark)!important}
+
+  /* SEARCH BAR */
+  .search-bar{background:var(--navy);padding:0 24px 14px;border-bottom:1px solid rgba(255,255,255,.08)}
+  .search-wrap{max-width:620px;position:relative}
+  .search-wrap input{width:100%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;padding:9px 16px 9px 40px;border-radius:8px;font-size:14px;outline:none;transition:all .2s}
+  .search-wrap input::placeholder{color:rgba(255,255,255,.5)}
+  .search-wrap input:focus{background:rgba(255,255,255,.15);border-color:var(--teal)}
+  .search-wrap .s-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:.5;color:#fff;font-size:16px}
+
+  /* PARTNER TOGGLE */
+  .partner-bar{background:#fff;border-bottom:1px solid #e2e8f0;padding:10px 24px;display:flex;align-items:center;gap:12px;font-size:13px;color:#64748b}
+  .toggle-group{display:flex;background:#f1f5f9;border-radius:8px;padding:3px;gap:2px}
+  .toggle-btn{padding:5px 16px;border:none;background:none;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;color:#64748b;transition:all .15s}
+  .toggle-btn.active{background:#fff;color:var(--navy);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+
+  /* LAYOUT */
+  .layout{display:flex;flex:1;min-height:0}
+
+  /* SIDEBAR */
+  aside{width:var(--sidebar-w);background:#fff;border-right:1px solid #e2e8f0;overflow-y:auto;flex-shrink:0;position:sticky;top:56px;max-height:calc(100vh - 56px)}
+  .sidebar-section{padding:8px 0}
+  .sidebar-label{font-size:11px;font-weight:700;color:#94a3b8;letter-spacing:.08em;text-transform:uppercase;padding:8px 20px 4px}
+  .sidebar-item{display:flex;align-items:center;gap:8px;padding:7px 20px;font-size:13.5px;color:#4a5568;cursor:pointer;transition:all .15s;border-left:3px solid transparent;text-decoration:none}
+  .sidebar-item:hover{background:var(--teal-light);color:var(--navy)}
+  .sidebar-item.active{background:var(--teal-light);color:var(--teal-dark);border-left-color:var(--teal);font-weight:600}
+  .method-badge{font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;flex-shrink:0}
+  .GET{background:#dcfce7;color:#15803d}.POST{background:#dbeafe;color:#1d4ed8}.PUT{background:#fef3c7;color:#b45309}
+
+  /* MAIN CONTENT */
+  main{flex:1;overflow-y:auto;padding:32px 40px;max-width:900px}
+
+  /* FLOW DIAGRAM */
+  .flow{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:28px;margin-bottom:32px}
+  .flow h2{font-size:18px;margin-bottom:20px;color:var(--navy)}
+  .flow-steps{display:flex;align-items:center;gap:0;overflow-x:auto;padding-bottom:4px}
+  .flow-step{display:flex;flex-direction:column;align-items:center;gap:8px;min-width:120px}
+  .step-num{width:36px;height:36px;border-radius:50%;background:var(--teal);color:#fff;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center}
+  .step-label{font-size:12px;font-weight:600;color:var(--navy);text-align:center;line-height:1.3}
+  .step-sub{font-size:11px;color:#64748b;text-align:center}
+  .flow-arrow{flex:1;height:2px;background:var(--teal);min-width:24px;position:relative;top:-12px}
+  .flow-arrow::after{content:'▶';position:absolute;right:-6px;top:-8px;color:var(--teal);font-size:12px}
+
+  /* SECTION HEADERS */
+  .section-header{margin-bottom:24px}
+  .section-header h1{font-size:26px;font-weight:700;color:var(--navy);margin-bottom:6px}
+  .section-header p{color:#64748b;font-size:15px;line-height:1.6}
+  .tag{display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:3px 10px;border-radius:20px;font-weight:600;margin-right:6px;margin-bottom:6px}
+  .tag.version{background:#f0fdf4;color:#166534;border:1px solid #bbf7d0}
+  .tag.updated{background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe}
+
+  /* ENDPOINT CARD */
+  .endpoint-card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;margin-bottom:20px;overflow:hidden}
+  .endpoint-head{display:flex;align-items:center;gap:12px;padding:16px 20px;cursor:pointer;transition:background .15s}
+  .endpoint-head:hover{background:#f8fafc}
+  .endpoint-head .method{font-size:13px;font-weight:700;padding:4px 10px;border-radius:6px;min-width:52px;text-align:center}
+  .endpoint-path{font-family:'SF Mono',Consolas,monospace;font-size:14px;color:var(--navy);font-weight:500}
+  .endpoint-desc{margin-left:auto;font-size:13px;color:#64748b}
+  .endpoint-body{border-top:1px solid #e2e8f0;padding:20px}
+  .hidden{display:none}
+
+  /* PARTNER CALLOUT */
+  .broker-note,.referrer-note{border-radius:8px;padding:12px 16px;font-size:13px;margin:14px 0;display:flex;gap:10px}
+  .broker-note{background:#fffbeb;border:1px solid #fde68a;color:#92400e}
+  .referrer-note{background:#eff6ff;border:1px solid #bfdbfe;color:#1e3a8a}
+  .broker-note .n-icon,.referrer-note .n-icon{font-size:16px;flex-shrink:0}
+
+  /* PARAMS TABLE */
+  table{width:100%;border-collapse:collapse;font-size:13px;margin:12px 0}
+  th{text-align:left;padding:8px 12px;background:#f8fafc;color:#64748b;font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #e2e8f0}
+  td{padding:9px 12px;border-bottom:1px solid #f1f5f9;vertical-align:top}
+  td code{font-family:'SF Mono',Consolas,monospace;font-size:12px;background:#f1f5f9;padding:2px 6px;border-radius:4px;color:#be185d}
+  .req-badge{font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px}
+  .req{background:#fee2e2;color:#991b1b}.cond{background:#fef3c7;color:#92400e}.opt{background:#f0fdf4;color:#166534}
+
+  /* CODE BLOCK */
+  .code-block{border-radius:8px;overflow:hidden;margin:12px 0;font-size:13px}
+  .code-tabs{display:flex;background:#253447;padding:6px 8px 0;gap:2px}
+  .code-tab{padding:6px 14px;border-radius:6px 6px 0 0;font-size:12px;font-weight:600;cursor:pointer;color:rgba(255,255,255,.5);transition:all .15s}
+  .code-tab.active{background:var(--code-bg);color:#fff}
+  .code-body{background:var(--code-bg);padding:20px;overflow-x:auto;position:relative}
+  .code-body pre{color:#e2e8f0;line-height:1.6;font-family:'SF Mono',Consolas,monospace;white-space:pre}
+  .copy-btn{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);border:none;padding:4px 10px;border-radius:5px;font-size:11px;cursor:pointer;transition:all .15s}
+  .copy-btn:hover{background:rgba(255,255,255,.2);color:#fff}
+  .copy-btn.copied{background:var(--teal);color:#fff}
+  .hl-key{color:#7dd3fc}.hl-str{color:#86efac}.hl-num{color:#fbbf24}.hl-bool{color:#f472b6}.hl-comment{color:#64748b;font-style:italic}
+
+  /* STATUS TABLE */
+  .status-grid{display:grid;gap:8px;margin:12px 0}
+  .status-row{display:flex;align-items:flex-start;gap:12px;padding:10px 14px;border-radius:8px;background:#f8fafc;border:1px solid #e2e8f0}
+  .status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+  .dot-success{background:#22c55e}.dot-info{background:#3b82f6}.dot-warn{background:#f59e0b}.dot-error{background:#ef4444}
+  .status-name{font-family:'SF Mono',Consolas,monospace;font-size:12px;font-weight:600;color:var(--navy);min-width:240px}
+  .status-desc{font-size:13px;color:#4a5568}
+
+  /* LEGAL SECTION */
+  details.legal{background:#fff;border:1px solid #e2e8f0;border-radius:10px;margin-bottom:20px}
+  details.legal summary{padding:16px 20px;cursor:pointer;font-weight:600;color:var(--navy);list-style:none;display:flex;align-items:center;gap:8px}
+  details.legal summary::before{content:'📋';font-size:16px}
+  details.legal summary::after{content:'›';margin-left:auto;font-size:18px;transition:transform .2s;color:#94a3b8}
+  details.legal[open] summary::after{transform:rotate(90deg)}
+  details.legal .legal-body{padding:0 20px 20px;font-size:13px;color:#4a5568;line-height:1.7;max-height:300px;overflow-y:auto}
+
+  /* QUICKSTART */
+  .step-card{display:flex;gap:16px;padding:16px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;margin-bottom:12px}
+  .step-circle{width:32px;height:32px;border-radius:50%;background:var(--navy);color:#fff;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .step-content h3{font-size:15px;font-weight:600;margin-bottom:4px}
+  .step-content p{font-size:13px;color:#64748b;line-height:1.5}
+  .link-btn{display:inline-block;margin-top:8px;padding:6px 14px;background:var(--teal);color:#fff;border-radius:6px;font-size:12px;font-weight:600;text-decoration:none;transition:background .15s}
+  .link-btn:hover{background:var(--teal-dark)}
+  .link-btn.outline{background:none;border:1px solid var(--teal);color:var(--teal)}
+  .link-btn.outline:hover{background:var(--teal-light)}
+
+  /* DIVIDER */
+  hr.section-divider{border:none;border-top:1px solid #e2e8f0;margin:28px 0}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="logo" href="#">
+    <svg viewBox="0 0 44 54" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M44 0C44 0 26.4 3.44 22 23.12V54C42.8 48.96 44 25.36 44 21.6V0Z" fill="#323F51"/>
+      <path d="M44 0H0C0 0 17.68 3.44 22 23.12C26.4 3.44 44 0 44 0Z" fill="#62C4BB"/>
+      <path d="M22 23.12C17.68 3.52 0 0 0 0V21.52C0.08 25.36 1.28 48.96 22 53.92V23.12Z" fill="black"/>
+    </svg>
+    Wisr <span>Dev Portal</span>
+  </a>
+  <span class="badge">v3 · 2026.02.10</span>
+  <div class="spacer"></div>
+  <a href="#">Changelog</a>
+  <a href="#">Swagger ↗</a>
+  <a href="#" class="nav-cta">Get API Access</a>
+</nav>
+
+<!-- SEARCH -->
+<div class="search-bar">
+  <div class="search-wrap">
+    <span class="s-icon">⌕</span>
+    <input type="text" placeholder="Search endpoints, parameters, status codes…" id="searchInput"/>
+  </div>
+</div>
+
+<!-- PARTNER TOGGLE -->
+<div class="partner-bar">
+  <span>Viewing docs as:</span>
+  <div class="toggle-group">
+    <button class="toggle-btn active" onclick="setPartner('all',this)">All Partners</button>
+    <button class="toggle-btn" onclick="setPartner('broker',this)">Broker Network</button>
+    <button class="toggle-btn" onclick="setPartner('referrer',this)">Referrer</button>
+  </div>
+  <span id="partner-hint" style="color:#94a3b8;font-size:12px;margin-left:8px"></span>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+  <!-- SIDEBAR -->
+  <aside>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Getting Started</div>
+      <a class="sidebar-item active" onclick="showSection('overview')">🏠 Overview & Flow</a>
+      <a class="sidebar-item" onclick="showSection('quickstart')">⚡ Quickstart Guide</a>
+      <a class="sidebar-item" onclick="showSection('auth')">🔑 Authentication</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Rate Estimates</div>
+      <a class="sidebar-item" onclick="showSection('re-post')"><span class="method-badge POST">POST</span> Submit Rate Estimate</a>
+      <a class="sidebar-item" onclick="showSection('re-get')"><span class="method-badge GET">GET</span> Rate Estimate Status</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Applications</div>
+      <a class="sidebar-item" onclick="showSection('app-put')"><span class="method-badge PUT">PUT</span> Save Draft</a>
+      <a class="sidebar-item" onclick="showSection('app-post')"><span class="method-badge POST">POST</span> Submit Application</a>
+      <a class="sidebar-item" onclick="showSection('app-get')"><span class="method-badge GET">GET</span> Application Status</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Reference</div>
+      <a class="sidebar-item" onclick="showSection('terms')"><span class="method-badge GET">GET</span> Terms & Conditions</a>
+      <a class="sidebar-item" onclick="showSection('errors')">⚠️ Error Handling</a>
+      <a class="sidebar-item" onclick="showSection('validation')">✅ Validation Guide</a>
+      <a class="sidebar-item" onclick="showSection('legal')">📋 API Licence</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main id="main-content">
+
+    <!-- ===== OVERVIEW ===== -->
+    <div id="section-overview">
+      <div class="section-header">
+        <div>
+          <span class="tag version">v3</span>
+          <span class="tag updated">Updated Feb 2026</span>
+        </div>
+        <h1>Wisr External API</h1>
+        <p>Enable your customers to request rate estimates and submit loan applications directly through your platform via the Wisr REST API. JSON over HTTPS, standard HTTP verbs and response codes.</p>
+      </div>
+
+      <!-- API Flow Diagram -->
+      <div class="flow">
+        <h2>API Flow — End to End</h2>
+        <div class="flow-steps">
+          <div class="flow-step">
+            <div class="step-num">1</div>
+            <div class="step-label">POST Rate Estimate</div>
+            <div class="step-sub">Get wisrApplicationId</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="flow-step">
+            <div class="step-num">2</div>
+            <div class="step-label">Poll GET Status</div>
+            <div class="step-sub">Wait ~7s, poll every 0.5s</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="flow-step">
+            <div class="step-num">3</div>
+            <div class="step-label">PUT Draft App</div>
+            <div class="step-sub">Save full application</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="flow-step">
+            <div class="step-num">4</div>
+            <div class="step-label">POST Submit</div>
+            <div class="step-sub">Submit for assessment</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="flow-step">
+            <div class="step-num">5</div>
+            <div class="step-label">Poll GET Status</div>
+            <div class="step-sub">Track decision</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="endpoint-card">
+        <div class="endpoint-head" onclick="toggleCard(this)">
+          <span style="font-weight:600;font-size:15px">Base URLs</span>
+          <span class="endpoint-desc">Sandbox &amp; Production</span>
+        </div>
+        <div class="endpoint-body">
+          <table>
+            <tr><th>Environment</th><th>Base URL</th></tr>
+            <tr><td>Sandbox</td><td><code>https://apis.sandbox.wisr.tech</code></td></tr>
+            <tr><td>Production</td><td><code>https://apis.wisr.tech</code></td></tr>
+            <tr><td>Swagger (Sandbox)</td><td><code>https://apis-docs.sandbox.wisr.tech/index.html</code></td></tr>
+            <tr><td>Swagger (Prod)</td><td><code>https://apis-docs.wisr.tech/index.html</code></td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== QUICKSTART ===== -->
+    <div id="section-quickstart" class="hidden">
+      <div class="section-header">
+        <h1>⚡ Quickstart Guide</h1>
+        <p>Make your first successful API call in 3 steps.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-circle">1</div>
+        <div class="step-content">
+          <h3>Get your credentials</h3>
+          <p>You need an <strong>API key</strong>, <strong>partner-company-id</strong>, and optionally a <strong>partner-id</strong> (required for broker networks). Email <a href="mailto:apisupport@wisr.com.au" style="color:var(--teal)">apisupport@wisr.com.au</a> to request access.</p>
+          <a class="link-btn outline" onclick="showSection('auth')">Read Auth Guide →</a>
+        </div>
+      </div>
+      <div class="step-card">
+        <div class="step-circle">2</div>
+        <div class="step-content">
+          <h3>Configure your first request</h3>
+          <p>Set the base URL to the sandbox and add your credentials as headers. Then POST to <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;font-size:12px">/apply/v3/application/rateEstimate</code></p>
+        </div>
+      </div>
+      <div class="step-card">
+        <div class="step-circle">3</div>
+        <div class="step-content">
+          <h3>Send the test request</h3>
+          <p>Use the sample body below. A <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;font-size:12px">202 Accepted</code> with a <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;font-size:12px">wisrApplicationId</code> means you're connected!</p>
+        </div>
+      </div>
+      <div class="code-block">
+        <div class="code-tabs">
+          <div class="code-tab active" onclick="switchTab(this,'qs-curl')">cURL</div>
+          <div class="code-tab" onclick="switchTab(this,'qs-python')">Python</div>
+          <div class="code-tab" onclick="switchTab(this,'qs-js')">JavaScript</div>
+        </div>
+        <div class="code-body">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre id="qs-curl"><span class="hl-comment"># Quickstart – POST Rate Estimate (Sandbox)</span>
+curl -X POST https://apis.sandbox.wisr.tech/apply/v3/application/rateEstimate \
+  -H <span class="hl-str">"subscription-key: YOUR_API_KEY"</span> \
+  -H <span class="hl-str">"partner-company-id: YOUR_COMPANY_ID"</span> \
+  -H <span class="hl-str">"Content-Type: application/json"</span> \
+  -d <span class="hl-str">'{
+    "loanAmount": 10000.00,
+    "loanPurpose": "holiday",
+    "applicants": [{
+      "firstName": "Test", "lastName": "Lot",
+      "doB": "01/01/1999",
+      "householdDetails": { "maritalStatus": "single" },
+      "totalIncomeBeforeTax": 99999,
+      "employments": [{ "employmentStatus": "full-time", "startDate": "06/2010" }],
+      "addresses": [{
+        "streetNumber": "55", "streetName": "Harrington",
+        "streetType": "street", "suburb": "The Rocks",
+        "state": "nsw", "postcode": "2000",
+        "isPrimary": true, "startDate": "01/2016", "residencyStatus": "renter"
+      }],
+      "contact": { "mobile": "0400000000", "email": "test@example.com" }
+    }],
+    "declarations": {
+      "accessSeekerCreditReportConsent": true,
+      "electronicCommunicationConsent": true,
+      "meetsEligibility": true,
+      "privacyConsent": true
+    }
+  }'</span></pre>
+          <pre id="qs-python" class="hidden"><span class="hl-comment"># Quickstart – POST Rate Estimate (Sandbox)</span>
+<span class="hl-key">import</span> requests
+
+url = <span class="hl-str">"https://apis.sandbox.wisr.tech/apply/v3/application/rateEstimate"</span>
+headers = {
+    <span class="hl-str">"subscription-key"</span>: <span class="hl-str">"YOUR_API_KEY"</span>,
+    <span class="hl-str">"partner-company-id"</span>: <span class="hl-str">"YOUR_COMPANY_ID"</span>,
+    <span class="hl-str">"Content-Type"</span>: <span class="hl-str">"application/json"</span>
+}
+payload = {
+    <span class="hl-str">"loanAmount"</span>: <span class="hl-num">10000.00</span>,
+    <span class="hl-str">"loanPurpose"</span>: <span class="hl-str">"holiday"</span>,
+    <span class="hl-str">"applicants"</span>: [{
+        <span class="hl-str">"firstName"</span>: <span class="hl-str">"Test"</span>, <span class="hl-str">"lastName"</span>: <span class="hl-str">"Lot"</span>,
+        <span class="hl-str">"doB"</span>: <span class="hl-str">"01/01/1999"</span>,
+        <span class="hl-str">"totalIncomeBeforeTax"</span>: <span class="hl-num">99999</span>,
+        <span class="hl-str">"householdDetails"</span>: {<span class="hl-str">"maritalStatus"</span>: <span class="hl-str">"single"</span>},
+        <span class="hl-str">"employments"</span>: [{<span class="hl-str">"employmentStatus"</span>: <span class="hl-str">"full-time"</span>, <span class="hl-str">"startDate"</span>: <span class="hl-str">"06/2010"</span>}],
+        <span class="hl-str">"addresses"</span>: [{<span class="hl-str">"streetNumber"</span>: <span class="hl-str">"55"</span>, <span class="hl-str">"streetName"</span>: <span class="hl-str">"Harrington"</span>,
+            <span class="hl-str">"streetType"</span>: <span class="hl-str">"street"</span>, <span class="hl-str">"suburb"</span>: <span class="hl-str">"The Rocks"</span>,
+            <span class="hl-str">"state"</span>: <span class="hl-str">"nsw"</span>, <span class="hl-str">"postcode"</span>: <span class="hl-str">"2000"</span>,
+            <span class="hl-str">"isPrimary"</span>: <span class="hl-bool">True</span>, <span class="hl-str">"startDate"</span>: <span class="hl-str">"01/2016"</span>,
+            <span class="hl-str">"residencyStatus"</span>: <span class="hl-str">"renter"</span>}],
+        <span class="hl-str">"contact"</span>: {<span class="hl-str">"mobile"</span>: <span class="hl-str">"0400000000"</span>, <span class="hl-str">"email"</span>: <span class="hl-str">"test@example.com"</span>}
+    }],
+    <span class="hl-str">"declarations"</span>: {
+        <span class="hl-str">"accessSeekerCreditReportConsent"</span>: <span class="hl-bool">True</span>,
+        <span class="hl-str">"electronicCommunicationConsent"</span>: <span class="hl-bool">True</span>,
+        <span class="hl-str">"meetsEligibility"</span>: <span class="hl-bool">True</span>,
+        <span class="hl-str">"privacyConsent"</span>: <span class="hl-bool">True</span>
+    }
+}
+r = requests.post(url, json=payload, headers=headers)
+<span class="hl-key">print</span>(r.json())  <span class="hl-comment"># { "wisrApplicationId": "..." }</span></pre>
+          <pre id="qs-js" class="hidden"><span class="hl-comment">// Quickstart – POST Rate Estimate (Sandbox)</span>
+<span class="hl-key">const</span> res = <span class="hl-key">await</span> fetch(
+  <span class="hl-str">"https://apis.sandbox.wisr.tech/apply/v3/application/rateEstimate"</span>,
+  {
+    method: <span class="hl-str">"POST"</span>,
+    headers: {
+      <span class="hl-str">"subscription-key"</span>: <span class="hl-str">"YOUR_API_KEY"</span>,
+      <span class="hl-str">"partner-company-id"</span>: <span class="hl-str">"YOUR_COMPANY_ID"</span>,
+      <span class="hl-str">"Content-Type"</span>: <span class="hl-str">"application/json"</span>,
+    },
+    body: JSON.stringify({
+      loanAmount: <span class="hl-num">10000</span>,
+      loanPurpose: <span class="hl-str">"holiday"</span>,
+      applicants: [{ firstName: <span class="hl-str">"Test"</span>, lastName: <span class="hl-str">"Lot"</span>, ... }],
+      declarations: { meetsEligibility: <span class="hl-bool">true</span>, privacyConsent: <span class="hl-bool">true</span>,
+        accessSeekerCreditReportConsent: <span class="hl-bool">true</span>, electronicCommunicationConsent: <span class="hl-bool">true</span> }
+    })
+  }
+);
+<span class="hl-key">const</span> { wisrApplicationId } = <span class="hl-key">await</span> res.json();
+console.log(wisrApplicationId); <span class="hl-comment">// Use this to poll status</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== AUTH ===== -->
+    <div id="section-auth" class="hidden">
+      <div class="section-header">
+        <h1>🔑 Authentication</h1>
+        <p>All API calls require three header values. Add them to every request.</p>
+      </div>
+      <table>
+        <tr><th>Header (case-sensitive)</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>subscription-key</code></td><td><span class="req-badge req">Required</span></td><td>Your unique API key. Keep secret — never commit to Git or expose client-side.</td></tr>
+        <tr><td><code>partner-company-id</code></td><td><span class="req-badge req">Required</span></td><td>Identifies the firm submitting on behalf of a customer.</td></tr>
+        <tr><td><code>partner-id</code></td><td><span class="req-badge cond">Conditional</span></td><td>Identifies the individual broker. Only required when submitting on behalf of a specific broker.</td></tr>
+      </table>
+      <div class="broker-note" id="broker-auth-note">
+        <span class="n-icon">🏢</span>
+        <div><strong>Broker Networks:</strong> You will always need to include a <code>partner-id</code> in addition to the <code>partner-company-id</code>. Each broker in your network has their own <code>partner-id</code>.</div>
+      </div>
+      <div class="referrer-note" id="referrer-auth-note">
+        <span class="n-icon">🔗</span>
+        <div><strong>Referrers:</strong> You do <em>not</em> need to include a <code>partner-id</code>. Your <code>partner-company-id</code> is configured for referral-type submissions.</div>
+      </div>
+      <hr class="section-divider"/>
+      <h3 style="font-size:15px;margin-bottom:8px">Hierarchy</h3>
+      <p style="font-size:13px;color:#4a5568;line-height:1.6">One API Key → many <code>partner-company-id</code>s → many <code>partner-id</code>s. All three must be validly related — mismatches return <code>400 Bad Request</code>.</p>
+      <p style="margin-top:12px;font-size:13px">Request credentials: <a href="mailto:apisupport@wisr.com.au" style="color:var(--teal)">apisupport@wisr.com.au</a></p>
+    </div>
+
+    <!-- ===== POST RATE ESTIMATE ===== -->
+    <div id="section-re-post" class="hidden">
+      <div class="section-header">
+        <h1><span class="method-badge POST" style="font-size:14px;padding:4px 10px">POST</span> Submit Rate Estimate</h1>
+        <p>The starting point for all new loans. Submit applicant data and receive a <code>wisrApplicationId</code> to poll for the outcome.</p>
+      </div>
+      <div class="endpoint-card">
+        <div class="endpoint-head">
+          <span class="method POST">POST</span>
+          <span class="endpoint-path">/apply/v{version}/application/rateEstimate</span>
+        </div>
+      </div>
+      <table>
+        <tr><th>Performance</th><th>Target</th></tr>
+        <tr><td>Average response</td><td>&lt; 500ms (acknowledgement only — not the rate estimate outcome)</td></tr>
+        <tr><td>95th percentile</td><td>&lt; 2000ms</td></tr>
+      </table>
+      <hr class="section-divider"/>
+      <h3 style="font-size:15px;margin-bottom:12px">Key Parameters</h3>
+      <table>
+        <tr><th>Field</th><th>Type</th><th>Required</th><th>Notes</th></tr>
+        <tr><td><code>loanAmount</code></td><td>number</td><td><span class="req-badge req">Required</span></td><td>Amount to borrow</td></tr>
+        <tr><td><code>loanPurpose</code></td><td>string</td><td><span class="req-badge req">Required</span></td><td>e.g. "holiday", "car", "consolidation"</td></tr>
+        <tr><td><code>requestSecuredRate</code></td><td>boolean</td><td><span class="req-badge opt">Optional</span></td><td>Defaults to <code>true</code> when loanPurpose is "car"</td></tr>
+        <tr><td><code>rateDiscount</code></td><td>number</td><td><span class="req-badge cond">Broker only</span></td><td>Up to 2.00% for eligible brokers on secured loans</td></tr>
+        <tr><td><code>brokerFee</code></td><td>number</td><td><span class="req-badge cond">Broker only</span></td><td>Custom fee; cannot exceed the default fee</td></tr>
+        <tr><td><code>applicants</code></td><td>array</td><td><span class="req-badge req">Required</span></td><td>One applicant only at this stage</td></tr>
+        <tr><td><code>declarations</code></td><td>object</td><td><span class="req-badge req">Required</span></td><td>All four consents must be <code>true</code></td></tr>
+      </table>
+      <div class="broker-note" id="broker-re-note">
+        <span class="n-icon">🏢</span>
+        <div><strong>Broker Networks:</strong> You can set a custom <code>brokerFee</code> and <code>rateDiscount</code> (secured loans only). Rate discounts reduce commission proportionally. The loan will appear in the Wisr Broker Portal for follow-up.</div>
+      </div>
+      <div class="referrer-note" id="referrer-re-note">
+        <span class="n-icon">🔗</span>
+        <div><strong>Referrers:</strong> After polling the status, you'll receive an <code>applyUrl</code> to direct the customer to wisr.com.au to complete their application. No <code>brokerFee</code> or <code>rateDiscount</code> applies.</div>
+      </div>
+      <hr class="section-divider"/>
+      <h3 style="font-size:15px;margin-bottom:10px">Response</h3>
+      <p style="font-size:13px;color:#4a5568;margin-bottom:10px">Success: <code>202 Accepted</code> — store the <code>wisrApplicationId</code> immediately, you'll need it for all subsequent calls.</p>
+      <div class="code-block">
+        <div class="code-tabs">
+          <div class="code-tab active" onclick="switchTab(this,'re-resp')">Response</div>
+        </div>
+        <div class="code-body">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre id="re-resp">{
+  <span class="hl-key">"wisrApplicationId"</span>: <span class="hl-str">"1d5f30ee-d16b-427b-8749-d491de859064"</span>
+}</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== GET RATE ESTIMATE STATUS ===== -->
+    <div id="section-re-get" class="hidden">
+      <div class="section-header">
+        <h1><span class="method-badge GET" style="font-size:14px;padding:4px 10px">GET</span> Rate Estimate Status</h1>
+        <p>Poll this endpoint to get the outcome of a rate estimate. Wait 5 seconds after the initial POST, then poll every 500ms until a definitive status is returned.</p>
+      </div>
+      <div class="endpoint-card">
+        <div class="endpoint-head">
+          <span class="method GET">GET</span>
+          <span class="endpoint-path">/apply/v{version}/application/{wisrApplicationId}/rateEstimate</span>
+        </div>
+      </div>
+      <table>
+        <tr><th>Performance</th><th>Average</th><th>95th Percentile</th></tr>
+        <tr><td>Total processing time</td><td>&lt; 7,000ms</td><td>&lt; 11,000ms</td></tr>
+        <tr><td>Bureau response time</td><td>~6,100ms</td><td>~10,000ms</td></tr>
+      </table>
+      <hr class="section-divider"/>
+      <h3 style="font-size:15px;margin-bottom:12px">Status Outcomes</h3>
+      <div class="status-grid">
+        <div class="status-row"><div class="status-dot dot-success"></div><div><div class="status-name">RateEstimateSuccessful</div><div class="status-desc">Rate estimate generated. <code>allowApplication: true</code> — you can proceed to submit an application.</div></div></div>
+        <div class="status-row"><div class="status-dot dot-info"></div><div><div class="status-name">RateEstimatePending</div><div class="status-desc">Still processing — keep polling every 500ms.</div></div></div>
+        <div class="status-row"><div class="status-dot dot-warn"></div><div><div class="status-name">RateEstimateReduced</div><div class="status-desc">Customer eligible for a lower amount than requested. The estimate reflects the maximum eligible amount.</div></div></div>
+        <div class="status-row"><div class="status-dot dot-error"></div><div><div class="status-name">RateEstimateDeclined</div><div class="status-desc">Does not meet credit policy. Stop polling.</div></div></div>
+        <div class="status-row"><div class="status-dot dot-error"></div><div><div class="status-name">RateEstimateNoRecord</div><div class="status-desc">Equifax file not found. Try with additional identity documents or previous addresses.</div></div></div>
+        <div class="status-row"><div class="status-dot dot-error"></div><div><div class="status-name">RateEstimateExpired</div><div class="status-desc">Estimate is older than 30 days. Request a new one.</div></div></div>
+        <div class="status-row"><div class="status-dot dot-error"></div><div><div class="status-name">RateEstimateAccountSuspended</div><div class="status-desc">Broker account suspended. Contact BDM.</div></div></div>
+      </div>
+      <div class="referrer-note" id="referrer-status-note" style="margin-top:16px">
+        <span class="n-icon">🔗</span>
+        <div><strong>Referrers:</strong> A successful response includes an <code>applyUrl</code>. Direct your customer to this URL to complete their application on wisr.com.au — no PUT/POST application calls needed from your side.</div>
+      </div>
+    </div>
+
+    <!-- ===== PUT DRAFT ===== -->
+    <div id="section-app-put" class="hidden">
+      <div class="section-header">
+        <h1><span class="method-badge PUT" style="font-size:14px;padding:4px 10px">PUT</span> Save Application Draft</h1>
+        <p>Save all full application data following a successful rate estimate where <code>allowApplication: true</code>. You can PUT multiple times progressively — the last PUT overwrites the full dataset.</p>
+      </div>
+      <div class="endpoint-card">
+        <div class="endpoint-head">
+          <span class="method PUT">PUT</span>
+          <span class="endpoint-path">/apply/v{version}/application/{wisrApplicationId}</span>
+        </div>
+      </div>
+      <p style="font-size:13px;color:#64748b;margin:12px 0">⚠️ Do not omit fields from the rate estimate — the PUT replaces the entire dataset. Any omitted field reverts to blank/default.</p>
+      <table>
+        <tr><th>New Field</th><th>Type</th><th>Required</th><th>Notes</th></tr>
+        <tr><td><code>LoanRequirementsAndObjectives</code></td><td>string</td><td><span class="req-badge req">Required</span></td><td>Responsible lending requirement</td></tr>
+        <tr><td><code>offerId</code></td><td>string</td><td><span class="req-badge req">Required</span></td><td>The indicative quote ID (3, 5 or 7yr term) from the rate estimate</td></tr>
+        <tr><td><code>financialDetails</code></td><td>object</td><td><span class="req-badge req">Required</span></td><td>Expenses, liabilities, assets</td></tr>
+        <tr><td><code>SignificantPlannedChanges</code></td><td>object</td><td><span class="req-badge req">Required</span></td><td>Any anticipated changes impacting repayment capacity</td></tr>
+        <tr><td><code>directDebitBankAccount</code></td><td>object</td><td><span class="req-badge opt">Optional</span></td><td>Bank account for loan repayments</td></tr>
+        <tr><td><code>useESignatureContract</code></td><td>boolean</td><td><span class="req-badge opt">Optional</span></td><td>Defaults to <code>true</code> (eSign). Set <code>false</code> for PDF contracts sent to broker.</td></tr>
+      </table>
+      <div class="broker-note" id="broker-put-note">
+        <span class="n-icon">🏢</span>
+        <div><strong>Broker Networks:</strong> Use <code>loanAdditionalNotes</code> to pass notes to the Wisr assessor. Set <code>useESignatureContract: false</code> if you prefer PDF contracts sent directly to the broker.</div>
+      </div>
+    </div>
+
+    <!-- ===== POST SUBMIT ===== -->
+    <div id="section-app-post" class="hidden">
+      <div class="section-header">
+        <h1><span class="method-badge POST" style="font-size:14px;padding:4px 10px">POST</span> Submit Application</h1>
+        <p>Submit the application for credit assessment after a successful PUT. Returns <code>202 Accepted</code> — then poll GET application status for the outcome.</p>
+      </div>
+      <div class="endpoint-card">
+        <div class="endpoint-head">
+          <span class="method POST">POST</span>
+          <span class="endpoint-path">/apply/v{version}/application/{wisrApplicationId}/submit</span>
+        </div>
+      </div>
+      <p style="margin-top:16px;font-size:13px;color:#4a5568">The request body should be empty. The <code>wisrApplicationId</code> in the URL identifies the application. Use the same <code>partner-company-id</code> and <code>partner-id</code> headers as used on the original rate estimate.</p>
+    </div>
+
+    <!-- ===== GET APP STATUS ===== -->
+    <div id="section-app-get" class="hidden">
+      <div class="section-header">
+        <h1><span class="method-badge GET" style="font-size:14px;padding:4px 10px">GET</span> Application Status</h1>
+        <p>Poll for the credit decision on a submitted application.</p>
+      </div>
+      <div class="endpoint-card">
+        <div class="endpoint-head">
+          <span class="method GET">GET</span>
+          <span class="endpoint-path">/apply/v{version}/application/{wisrApplicationId}/status</span>
+        </div>
+      </div>
+      <div class="status-grid" style="margin-top:20px">
+        <div class="status-row"><div class="status-dot dot-success"></div><div><div class="status-name">Approved</div><div class="status-desc">Loan approved and contract sent (eSign or PDF per your setting).</div></div></div>
+        <div class="status-row"><div class="status-dot dot-info"></div><div><div class="status-name">PreSubmitServicingFailed</div><div class="status-desc">(v3+) Customer does not meet servicing requirements prior to submission.</div></div></div>
+        <div class="status-row"><div class="status-dot dot-warn"></div><div><div class="status-name">Pending / InReview</div><div class="status-desc">Assessment in progress — continue polling.</div></div></div>
+        <div class="status-row"><div class="status-dot dot-error"></div><div><div class="status-name">Declined</div><div class="status-desc">Application did not meet credit policy.</div></div></div>
+      </div>
+    </div>
+
+    <!-- ===== TERMS ===== -->
+    <div id="section-terms" class="hidden">
+      <div class="section-header">
+        <h1><span class="method-badge GET" style="font-size:14px;padding:4px 10px">GET</span> Terms & Conditions</h1>
+        <p>Always fetch T&C content from this endpoint to ensure you're presenting the latest version to customers — never hardcode the text.</p>
+      </div>
+      <div class="endpoint-card">
+        <div class="endpoint-head">
+          <span class="method GET">GET</span>
+          <span class="endpoint-path">/apply/v{version}/terms</span>
+        </div>
+      </div>
+      <p style="margin-top:16px;font-size:13px;color:#4a5568">The endpoint returns content for all four declaration fields required on both rate estimate and application draft requests: <code>meetsEligibility</code>, <code>privacyConsent</code>, <code>accessSeekerCreditReportConsent</code>, and <code>electronicCommunicationConsent</code>.</p>
+    </div>
+
+    <!-- ===== ERRORS ===== -->
+    <div id="section-errors" class="hidden">
+      <div class="section-header">
+        <h1>⚠️ Error Handling</h1>
+        <p>The API uses standard HTTP status codes. All error responses include a message to help debug the issue.</p>
+      </div>
+      <table>
+        <tr><th>Code</th><th>Meaning</th><th>Common Cause</th></tr>
+        <tr><td><code>400 Bad Request</code></td><td>Validation error</td><td>Missing/invalid partner IDs, malformed request body</td></tr>
+        <tr><td><code>401 Unauthorized</code></td><td>Auth failed</td><td>Invalid or missing <code>subscription-key</code></td></tr>
+        <tr><td><code>202 Accepted</code></td><td>Success</td><td>Request received and valid</td></tr>
+        <tr><td><code>429 Too Many Requests</code></td><td>Rate limited</td><td>Polling too frequently — back off and retry</td></tr>
+        <tr><td><code>5xx Server Error</code></td><td>Wisr-side error</td><td>Contact <a href="mailto:apisupport@wisr.com.au" style="color:var(--teal)">apisupport@wisr.com.au</a></td></tr>
+      </table>
+      <p style="margin-top:16px;font-size:13px;color:#4a5568">All requests must be made over <strong>HTTPS</strong>. HTTP calls will fail. Contact <a href="mailto:apisupport@wisr.com.au" style="color:var(--teal)">apisupport@wisr.com.au</a> for persistent issues.</p>
+    </div>
+
+    <!-- ===== VALIDATION ===== -->
+    <div id="section-validation" class="hidden">
+      <div class="section-header">
+        <h1>✅ Validation Guide</h1>
+        <p>Key validation rules to be aware of when constructing requests.</p>
+      </div>
+      <table>
+        <tr><th>Field</th><th>Rule</th></tr>
+        <tr><td><code>doB</code></td><td>Format: <code>DD/MM/YYYY</code></td></tr>
+        <tr><td><code>startDate / endDate</code></td><td>Format: <code>MM/YYYY</code></td></tr>
+        <tr><td><code>addresses</code></td><td>Previous address required if current address &lt; 36 months. Time calculated inclusively.</td></tr>
+        <tr><td><code>employments</code></td><td>Previous employment required if current employment &lt; 6 months.</td></tr>
+        <tr><td><code>driverLicence.cardNumber</code></td><td>Required for all Australian states (mandatory since v2, Sept 2022)</td></tr>
+        <tr><td><code>investmentProperty</code></td><td>Required on all rate estimate requests (mandatory since v3, June 2025)</td></tr>
+        <tr><td><code>rateDiscount</code></td><td>Max 2.00% for eligible brokers on secured loans only</td></tr>
+        <tr><td><code>securedAssetDetails.yearOfManufacture</code></td><td>Assets 13+ years old at loan start cannot be secured — defaults to unsecured</td></tr>
+        <tr><td><code>loanPurpose: "consolidation"</code></td><td>Must include ≥1 creditCard or personalLoan with <code>isForConsolidation: true</code></td></tr>
+        <tr><td><code>saleType: "refinance"</code></td><td>Must include exactly 1 personalLoan with <code>isForConsolidation: true</code></td></tr>
+      </table>
+    </div>
+
+    <!-- ===== LEGAL ===== -->
+    <div id="section-legal" class="hidden">
+      <div class="section-header">
+        <h1>📋 API Licence Agreement</h1>
+        <p>The legal terms governing use of the Wisr External API. Last modified 19 April 2023.</p>
+      </div>
+      <details class="legal">
+        <summary>View Full Licence Agreement</summary>
+        <div class="legal-body">
+          <p>This API Licence Agreement is a binding contract between you ("the Customer") and Wisr Finance Pty Ltd (ABN 39 119 503 221). By accessing or using the API you accept and agree to be legally bound by its terms.</p>
+          <p style="margin-top:12px"><strong>Key Terms:</strong></p>
+          <ul style="margin:8px 0 0 20px;line-height:1.8;font-size:13px">
+            <li>Wisr grants a non-exclusive, revocable, non-transferable licence to use the API solely for the Release Purpose.</li>
+            <li>You must keep your API Key secure and must not share it with third parties.</li>
+            <li>You may not sub-license, sell, or distribute API data or use it to build a competing product.</li>
+            <li>All API requests must be over HTTPS. You are responsible for securing the Customer System.</li>
+            <li>Wisr may update the API at its discretion. You must adopt updates within a reasonable time at your own cost.</li>
+            <li>Wisr's total liability under this agreement is capped at AUD $100.</li>
+            <li>Either party may terminate with 7 days written notice. Wisr may terminate immediately for breach.</li>
+            <li>The agreement is governed by the laws of New South Wales, Australia.</li>
+          </ul>
+          <p style="margin-top:12px;color:#94a3b8;font-size:12px">For the full agreement, refer to the original PDF documentation or contact <a href="mailto:contact@wisr.com.au" style="color:var(--teal)">contact@wisr.com.au</a>.</p>
+        </div>
+      </details>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  let currentPartner = 'all';
+
+  function showSection(id) {
+    document.querySelectorAll('[id^="section-"]').forEach(s => s.classList.add('hidden'));
+    document.getElementById('section-' + id).classList.remove('hidden');
+    document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+  }
+
+  function toggleCard(head) {
+    const body = head.nextElementSibling;
+    body.classList.toggle('hidden');
+  }
+
+  function setPartner(type, btn) {
+    currentPartner = type;
+    document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const hint = document.getElementById('partner-hint');
+    const brokerNotes = document.querySelectorAll('[id^="broker-"]');
+    const referrerNotes = document.querySelectorAll('[id^="referrer-"]');
+    if (type === 'broker') {
+      brokerNotes.forEach(n => n.style.display='flex');
+      referrerNotes.forEach(n => n.style.display='none');
+      hint.textContent = 'Showing broker-specific notes only';
+    } else if (type === 'referrer') {
+      brokerNotes.forEach(n => n.style.display='none');
+      referrerNotes.forEach(n => n.style.display='flex');
+      hint.textContent = 'Showing referrer-specific notes only';
+    } else {
+      brokerNotes.forEach(n => n.style.display='flex');
+      referrerNotes.forEach(n => n.style.display='flex');
+      hint.textContent = '';
+    }
+  }
+
+  function switchTab(tab, targetId) {
+    const codeBlock = tab.closest('.code-block');
+    codeBlock.querySelectorAll('.code-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    codeBlock.querySelectorAll('pre').forEach(p => p.classList.add('hidden'));
+    codeBlock.querySelector('#' + targetId).classList.remove('hidden');
+  }
+
+  function copyCode(btn) {
+    const pre = btn.nextElementSibling.textContent || btn.parentElement.querySelector('pre:not(.hidden)').textContent;
+    navigator.clipboard.writeText(pre.trim()).then(() => {
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    });
+  }
+
+  // Basic search highlight
+  document.getElementById('searchInput').addEventListener('input', function() {
+    const q = this.value.toLowerCase();
+    if (!q) return;
+    const items = document.querySelectorAll('.sidebar-item');
+    items.forEach(i => {
+      i.style.opacity = i.textContent.toLowerCase().includes(q) ? '1' : '0.4';
+    });
+  });
+</script>
+</body>
+</html>
